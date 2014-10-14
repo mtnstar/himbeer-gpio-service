@@ -1,11 +1,18 @@
-module GpioService
-  def post_init
-    puts "-- someone connected to the echo server!"
+require 'json'
+class GpioService < EventMachine::Connection
+
+  attr_reader :gpio
+
+  def initialize(gpio)
+    @gpio = gpio
   end
 
   def receive_data(data)
-    binding.pry
-    p "id " + data['id'] + " value " + data['value']
-    send_data ">>> you sent: #{id}"
+    jdata = JSON.parse(data)
+    pin = jdata['pin']
+    value = jdata['value']
+    p "setting pin: #{pin} value: #{value}"
+    gpio.write(pin,value)
   end
+
 end
