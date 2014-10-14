@@ -1,0 +1,7 @@
+# service
+listen_ip: 127.0.0.1
+listen_port: 88331
+
+# gpio ports
+gpio_pins:
+  1: OUT
