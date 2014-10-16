@@ -16,19 +16,23 @@ class GpioService < EventMachine::Connection
       pin = data_hash['pin']
       value = data_hash['value']
       gpioWrite(pin, value)
-      gpioRead(pin).to_json
+      answer = gpioRead(pin).to_json
+    else
+      answer = getErrorAnswerMissingKey()
     end
+    send_data(answer)
+
   end
 
   def gpioWrite(pin, value)
-    unless pin.blank? || value.blank?
+    unless pin.nil? || value.nil?
       p "writing pin: #{pin} value: #{value}"
       gpio.write(pin,value)
     end
   end
 
   def gpioRead(pin)
-    unless pin.blank?
+    unless pin.nil?
       value = gpio.read(pin)
       {pin: pin, value: value}
     end
@@ -45,6 +49,15 @@ class GpioService < EventMachine::Connection
       end
     end
     return true
+  end
+
+  def getErrorAnswerMissingKey()
+    createErrorAnswer('Invalid json data received')
+  end
+
+  def createErrorAnswer(msg)
+    error_msg = 'GPIO Service: ' + msg
+    {error: error_msg}
   end
 
 end

@@ -31,4 +31,29 @@ describe GpioService, "#hasRequiredKeys" do
     data_hash = {pin: 1, value: 1}
     expect(@gs.hasRequiredKeys(data_hash)).to be(true)
   end
+
+end
+
+describe GpioService, "#gpioWrite" do
+
+  before(:each) do
+    @gpio = double('gpio')
+    @gs = GpioService.new(nil, @gpio)
+  end
+
+  it "should not call gpio write if pin is missing" do
+    expect(@gpio).to receive(:write).never
+    @gs.gpioWrite(nil, 1)
+  end
+
+  it "should not call gpio write if value is missing" do
+    expect(@gpio).to receive(:write).never
+    @gs.gpioWrite(nil, 1)
+  end
+
+  it "should call gpio write if value and pin is present" do
+    expect(@gpio).to receive(:write).once
+    @gs.gpioWrite(1, 1)
+  end
+
 end
