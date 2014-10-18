@@ -52,8 +52,41 @@ describe GpioService, "#gpioWrite" do
   end
 
   it "should call gpio write if value and pin is present" do
-    expect(@gpio).to receive(:write).once
+    expect(@gpio).to receive(:write).with(1,1).once
     @gs.gpioWrite(1, 1)
+  end
+end
+
+describe GpioService, "#gpioRead" do
+
+  before(:each) do
+    @gpio = double('gpio')
+    @gs = GpioService.new(nil, @gpio)
+  end
+
+  it "should not call gpio read if pin is missing" do
+    expect(@gpio).to receive(:read).never
+    @gs.gpioRead(nil)
+  end
+
+  it "should not call gpio read" do
+    expect(@gpio).to receive(:read).with(1).once
+    @gs.gpioRead(1)
   end
 
 end
+
+describe GpioService, "#gpioRead" do
+
+  before(:each) do
+    gpio = nil
+    @gs = GpioService.new(nil, gpio)
+  end
+
+  it "should return error msg" do
+    answer = @gs.createErrorAnswer("foo")
+    expect(answer).to eq({error: 'GPIO Service: foo'})
+  end
+
+end
+
