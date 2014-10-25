@@ -1,8 +1,11 @@
 require 'json'
-require 'eventmachine'
-class GpioService < EventMachine::Connection
+require 'rack'
+require 'yaml'
 
-  @@required_keys = [:pin, :value]
+class GpioService
+
+  @@required_keys = ["pin", "value"]
+  @@http_success = '200'
 
   attr_reader :gpio
 
@@ -10,7 +13,10 @@ class GpioService < EventMachine::Connection
     @gpio = gpio
   end
 
-  def receive_data(data)
+  def call(env)
+    req = Rack::Request.new(env)
+    data = req.body.read
+
     data_hash = JSON.parse(data)
     if hasRequiredKeys(data_hash)
       pin = data_hash['pin']
@@ -20,8 +26,11 @@ class GpioService < EventMachine::Connection
     else
       answer = getErrorAnswerMissingKey()
     end
-    send_data(answer)
+    return response(@@http_success, data_hash.to_json)
+  end
 
+  def response(error_code, data)
+    [error_code, {'Content-Type' => 'application/json'}, [data]]
   end
 
   def gpioWrite(pin, value)

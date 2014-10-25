@@ -1,4 +1,3 @@
-require 'eventmachine'
 require 'yaml'
 require 'wiringpi'
 require_relative 'gpio_service'
@@ -15,11 +14,8 @@ gpios.each do |g|
   gpio.mode(pin, mode)
 end
 
+port = @config['listen_port']
+ip = @config['listen_ip']
 
-# start eventmachine server
-EventMachine::run {
-  listen_ip = @config['listen_ip']
-  listen_port = @config['listen_port']
-  EventMachine::start_server(listen_ip, listen_port, GpioService, gpio)
-  p "running gpio service on #{listen_ip}:#{listen_port}"
-}
+# start rack server
+Rack::Handler::WEBrick.run GpioService.new(gpio), :Port => port, :BindAddress => ip
