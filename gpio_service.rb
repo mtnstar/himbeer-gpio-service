@@ -4,7 +4,7 @@ require 'yaml'
 
 class GpioService
 
-  @@required_keys = ["pin", "value"]
+  @@required_keys = ["pin"]
   @@http_success = '200'
 
   attr_reader :gpio
@@ -18,15 +18,21 @@ class GpioService
     data = req.body.read
 
     data_hash = JSON.parse(data)
+
+    p "received: #{data}"
+
     if hasRequiredKeys(data_hash)
-      pin = data_hash['pin']
+      pin = data_hash['pin'].to_i
       value = data_hash['value']
-      gpioWrite(pin, value)
+      unless value.nil?
+        gpioWrite(pin, value.to_i)
+      end
       answer = gpioRead(pin).to_json
     else
       answer = getErrorAnswerMissingKey()
     end
-    return response(@@http_success, data_hash.to_json)
+    p answer
+    return response(@@http_success, answer)
   end
 
   def response(error_code, data)
@@ -43,8 +49,9 @@ class GpioService
   def gpioRead(pin)
     unless pin.nil?
       value = gpio.read(pin)
-      {pin: pin, value: value}
+      p "reading pin: #{pin} value: #{value}"
     end
+    {"pin" => pin, "value" => value}
   end
 
   def hasRequiredKeys(data_hash)
@@ -66,7 +73,7 @@ class GpioService
 
   def createErrorAnswer(msg)
     error_msg = 'GPIO Service: ' + msg
-    {error: error_msg}
+    {"error" => error_msg}
   end
 
 end

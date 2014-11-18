@@ -41,6 +41,11 @@ describe GpioService, "#gpioWrite" do
     @gs = GpioService.new(@gpio)
   end
 
+  it "should not call gpio write if pin and value is missing" do
+    expect(@gpio).to receive(:write).never
+    @gs.gpioWrite(nil,nil)
+  end
+
   it "should not call gpio write if pin is missing" do
     expect(@gpio).to receive(:write).never
     @gs.gpioWrite(nil,1)
