@@ -4,6 +4,8 @@ require 'yaml'
 
 class GpioService
 
+  TYPE_PWM = 'pwm'
+
   @@required_keys = ["pin"]
   @@http_success = '200'
 
@@ -24,8 +26,9 @@ class GpioService
     if hasRequiredKeys(data_hash)
       pin = data_hash['pin'].to_i
       value = data_hash['value']
+      type = data_hash['type']
       unless value.nil?
-        gpioWrite(pin, value.to_i)
+        gpioWrite(pin, value.to_i, type)
       end
       answer = gpioRead(pin).to_json
     else
@@ -39,10 +42,14 @@ class GpioService
     [error_code, {'Content-Type' => 'application/json'}, [data]]
   end
 
-  def gpioWrite(pin, value)
+  def gpioWrite(pin, value, type)
     unless pin.nil? || value.nil?
       p "writing pin: #{pin} value: #{value}"
-      gpio.write(pin,value)
+      if TYPE_PWM == type
+        gpio.pwmWrite(pin,value)
+      else
+        gpio.write(pin,value)
+      end
     end
   end
 
