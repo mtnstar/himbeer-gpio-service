@@ -5,4 +5,4 @@ listen_port: 88331
 # gpio ports
 gpio:
   0: OUTPUT
-  1: OUTPUT
+  1: PWM_OUTPUT
