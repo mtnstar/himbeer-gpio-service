@@ -1,0 +1,37 @@
+== README
+
+himbeer-gpio-service is a webservice for configuring and accessing the gpio ports of a raspberry pi. 
+
+it was developed for the rails service himbeer-rails which's source can be found here https://github.com/psunix/himbeer-rails
+
+== Installation
+
+reqirements: raspbian, ruby 1.9, bundler
+
+  git clone https://github.com/psunix/himbeer-gpio-service /opt/himbeer-gpio-service
+  cd /opt/himbeer-gpio-service
+  bundle
+
+now adjust config.yaml to your needs
+
+  # service
+  listen_ip: 0.0.0.0
+  listen_port: 88331
+
+  # gpio ports
+  gpio:
+    0: OUTPUT
+    1: PWM_OUTPUT
+
+listen_ip: ip address which the service should listen on
+listen_port: according port
+
+gpio: port configuration, OUTPUT or PWM_OUTPUT (pin 1 only)
+
+copy init.d script to /etc/init.d
+  cp bin/himbeer-gpio-service.init.d /etc/init.d/himbeer-gpio-service
+  chmod +x /etc/init.d/himbeer-gpio-service
+  update-rc.d himbeer-gpio-service defaults
+
+now you're ready to start the service
+  service himbeer-gpio-service start
